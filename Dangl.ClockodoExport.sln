@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dangl.ClockodoExport", "Dangl.ClockodoExport\Dangl.ClockodoExport.csproj", "{0AB17E15-7FF9-4A4A-9756-E76255EBC3CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dangl.ClockodoExport", "src\Dangl.ClockodoExport\Dangl.ClockodoExport.csproj", "{0AB17E15-7FF9-4A4A-9756-E76255EBC3CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B0DF5A90-E72C-4346-8557-823D2DC14271}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +20,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0AB17E15-7FF9-4A4A-9756-E76255EBC3CC} = {B0DF5A90-E72C-4346-8557-823D2DC14271}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A2BEFE83-3C94-4C3B-9934-4C3DDF1B1628}
