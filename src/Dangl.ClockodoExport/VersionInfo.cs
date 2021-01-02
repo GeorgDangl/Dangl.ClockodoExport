@@ -6,11 +6,11 @@ namespace Dangl.ClockodoExport
     [System.CodeDom.Compiler.GeneratedCode("GitVersionBuild", "")]
     public static class VersionInfo
     {
-        public static string Version => "0.1.2-beta0002";
-        public static string CommitInfo => "Branch.develop.Sha.f27890cbab2c87b15ab04d0be2851f20f89becc2";
+        public static string Version => "0.1.1-beta0010";
+        public static string CommitInfo => "Branch.develop.Sha.692f8435b523d6830626b75394b93141589150a9";
         public static string CommitDate => "2021-01-02";
-        public static string CommitHash => "f27890cbab2c87b15ab04d0be2851f20f89becc2";
-        public static string InformationalVersion => "0.1.2-beta.2+Branch.develop.Sha.f27890cbab2c87b15ab04d0be2851f20f89becc2";
-        public static DateTime BuildDateUtc => new DateTime(2021, 1, 2, 19, 5, 0, DateTimeKind.Utc);
+        public static string CommitHash => "692f8435b523d6830626b75394b93141589150a9";
+        public static string InformationalVersion => "0.1.1-beta.10+Branch.develop.Sha.692f8435b523d6830626b75394b93141589150a9";
+        public static DateTime BuildDateUtc => new DateTime(2021, 1, 2, 19, 53, 40, DateTimeKind.Utc);
     }
 }
