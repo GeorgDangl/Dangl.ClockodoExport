@@ -1,6 +1,6 @@
 # Dangl.ClockodoExport
 
-[![Actions Status](https://github.com/GeorgDangl/Dangl.ClockodoExport/workflows/continuous/badge.svg)](https://github.com/GeorgDangl/Dangl.ClockodoExport/actions)  
+[![Actions Status](https://github.com/GeorgDangl/Dangl.ClockodoExport/workflows/continuous/badge.svg?branch=develop)](https://github.com/GeorgDangl/Dangl.ClockodoExport/actions)  
 
 This is a small CLI tool that exports all data from your Clockodo account.
 
