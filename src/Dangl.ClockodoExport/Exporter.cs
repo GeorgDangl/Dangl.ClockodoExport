@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -124,6 +124,7 @@ namespace Dangl.ClockodoExport
                     httpClientOptions.DefaultRequestHeaders.Add("User-Agent", "Dangl IT GmbH Clockodo Export www.dangl-it.com");
                     httpClientOptions.DefaultRequestHeaders.Add("X-ClockodoApiUser", options.UserEmail);
                     httpClientOptions.DefaultRequestHeaders.Add("X-ClockodoApiKey", options.ClockodoApiToken);
+                    httpClientOptions.DefaultRequestHeaders.Add("X-Clockodo-External-Application", "Dangl IT GmbH Clockodo Export;info@dangl-it.com");
                 });
             return serviceCollection.BuildServiceProvider();
         }
