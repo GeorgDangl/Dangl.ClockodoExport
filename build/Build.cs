@@ -24,7 +24,6 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.GitHub.GitHubTasks;
 using static Nuke.WebDocu.WebDocuTasks;
 
-[CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
 class Build : NukeBuild
 {
@@ -126,10 +125,12 @@ namespace Dangl.ClockodoExport
                     .SetInformationalVersion(GitVersion.InformationalVersion)
                     .When(publishTarget[1] == "ubuntu-x64", c => c.SetProcessArgumentConfigurator(a => a
                        .Add("/p:PublishTrimmed=true")
+                       .Add("/p:TrimMode=partial")
                        .Add("/p:PublishSingleFile=true")
                        .Add("/p:DebugType=None")))
                     .When(publishTarget[1] != "ubuntu-x64", c => c.SetProcessArgumentConfigurator(a => a
                        .Add("/p:PublishTrimmed=true")
+                       .Add("/p:TrimMode=partial")
                        .Add("/p:PublishSingleFile=true")
                        .Add("/p:DebugType=None")
                        .Add("/p:PublishReadyToRun=true")))

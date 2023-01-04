@@ -30,9 +30,10 @@ namespace Dangl.ClockodoExport
         {
             // Customers
             var httpClient = _getHttpClient();
-            var customersResponse = await httpClient.GetStringAsync($"{CLOCKODO_API_BASE_URL}/customers");
-            var jsonObjectCustomers = JObject.Parse(customersResponse);
-            _clockodoDataByModelName.Add("customers", new List<JObject> { jsonObjectCustomers });
+
+            var customersUrl = $"{CLOCKODO_API_BASE_URL}/v2/customers";
+            var jsonObjectCustomers = await GetAllElementsFromPagedEndpointAsync(customersUrl);
+            _clockodoDataByModelName.Add("customers", jsonObjectCustomers);
 
             // Services
             var servicesResponse = await httpClient.GetStringAsync($"{CLOCKODO_API_BASE_URL}/services");
@@ -48,10 +49,10 @@ namespace Dangl.ClockodoExport
             var entriesResponse = await GetEntriesResponse();
             _clockodoDataByModelName.Add("entries", entriesResponse);
 
-            // Tasks
-            var tasksResponse = await httpClient.GetStringAsync($"{CLOCKODO_API_BASE_URL}/tasks");
-            var jsonObjectTasks = JObject.Parse(tasksResponse);
-            _clockodoDataByModelName.Add("tasks", new List<JObject> { jsonObjectTasks });
+            // Projects
+            var projectsUrl = $"{CLOCKODO_API_BASE_URL}/v2/projects";
+            var jsonObjectProjects = await GetAllElementsFromPagedEndpointAsync(projectsUrl);
+            _clockodoDataByModelName.Add("projects", jsonObjectProjects);
 
             foreach (var apiResult in _clockodoDataByModelName)
             {
@@ -85,14 +86,22 @@ namespace Dangl.ClockodoExport
             var startDate = "2020-01-01 00:00:00";
             var endDate = $"{DateTime.Now.Year + 5:0000}-12-31 23:59:59";
             var entriesUrl = $"{CLOCKODO_API_BASE_URL}/entries?time_since={startDate}&time_until={endDate}";
+            var responses = await GetAllElementsFromPagedEndpointAsync(entriesUrl, true);
+            return responses;
+        }
 
+        private async Task<List<JObject>> GetAllElementsFromPagedEndpointAsync(string endpoint,
+            bool appendPagingAsFirstQueryParameter = false)
+        {
             var responses = new List<JObject>();
 
             var currentPage = 1;
             var hasMoreData = true;
             while (hasMoreData)
             {
-                var pagedUrl = $"{entriesUrl}&page={currentPage++}";
+                var pagedUrl = appendPagingAsFirstQueryParameter
+                    ? $"{endpoint}&page={currentPage++}"
+                    : $"{endpoint}?page={currentPage++}";
                 var response = await _getHttpClient().GetStringAsync(pagedUrl);
                 var jObject = JObject.Parse(response);
                 responses.Add(jObject);
@@ -124,6 +133,7 @@ namespace Dangl.ClockodoExport
                     httpClientOptions.DefaultRequestHeaders.Add("User-Agent", "Dangl IT GmbH Clockodo Export www.dangl-it.com");
                     httpClientOptions.DefaultRequestHeaders.Add("X-ClockodoApiUser", options.UserEmail);
                     httpClientOptions.DefaultRequestHeaders.Add("X-ClockodoApiKey", options.ClockodoApiToken);
+                    httpClientOptions.DefaultRequestHeaders.Add("X-Clockodo-External-Application", "Dangl IT GmbH Clockodo Export;info@dangl-it.com");
                 });
             return serviceCollection.BuildServiceProvider();
         }
