@@ -83,9 +83,9 @@ namespace Dangl.ClockodoExport
 
         private async Task<List<JObject>> GetEntriesResponse()
         {
-            var startDate = "2020-01-01 00:00:00";
-            var endDate = $"{DateTime.Now.Year + 5:0000}-12-31 23:59:59";
-            var entriesUrl = $"{CLOCKODO_API_BASE_URL}/entries?time_since={startDate}&time_until={endDate}";
+            var startDate = "2020-01-01T00:00:00Z";
+            var endDate = $"{DateTime.Now.Year + 5:0000}-12-31T23:59:59Z";
+            var entriesUrl = $"{CLOCKODO_API_BASE_URL}/v2/entries?time_since={startDate}&time_until={endDate}";
             var responses = await GetAllElementsFromPagedEndpointAsync(entriesUrl, true);
             return responses;
         }
@@ -102,12 +102,21 @@ namespace Dangl.ClockodoExport
                 var pagedUrl = appendPagingAsFirstQueryParameter
                     ? $"{endpoint}&page={currentPage++}"
                     : $"{endpoint}?page={currentPage++}";
-                var response = await _getHttpClient().GetStringAsync(pagedUrl);
-                var jObject = JObject.Parse(response);
-                responses.Add(jObject);
-
-                var returnedPageCount = jObject["paging"]["count_pages"].ToObject<int>();
-                hasMoreData = returnedPageCount >= currentPage;
+                try
+                {
+                    var response = await _getHttpClient().GetStringAsync(pagedUrl);
+                    var jObject = JObject.Parse(response);
+                    responses.Add(jObject);
+                    var returnedPageCount = jObject["paging"]["count_pages"].ToObject<int>();
+                    hasMoreData = returnedPageCount >= currentPage;
+                }
+                catch (HttpRequestException)
+                {
+                    var rawResponse = await _getHttpClient().GetAsync(pagedUrl).ConfigureAwait(false);
+                    var responseString = await rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    Console.WriteLine($"Encountered a problem while fetching {pagedUrl}{Environment.NewLine}{responseString}");
+                    throw;
+                }
             }
 
             return responses;
