@@ -15,16 +15,27 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using static Nuke.Common.ChangeLog.ChangelogTasks;
-using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
-using static Nuke.Common.IO.TextTasks;
-using static Nuke.Common.Tools.DocFX.DocFXTasks;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.GitHub.GitHubTasks;
 using static Nuke.WebDocu.WebDocuTasks;
+using System.Collections.Generic;
+using Nuke.Common.Tools.Teams;
+using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using Nuke.Common.Tools.Coverlet;
+using Nuke.Common.Tools.ReportGenerator;
+using Nuke.Common.Utilities;
+using System.Collections;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using static Nuke.Common.ChangeLog.ChangelogTasks;
+using static Nuke.Common.IO.Globbing;
+using static Nuke.Common.Tooling.ProcessTasks;
+using Nuke.Common.Tools.Docker;
+using System.Xml.Schema;
+using Nuke.Common.Tools.Npm;
+using System.Text.RegularExpressions;
+using Microsoft.Build.Tasks;
 
-[ShutdownDotNetAfterServerBuild]
 class Build : NukeBuild
 {
     public static int Main() => Execute<Build>(x => x.Compile);
@@ -50,9 +61,9 @@ class Build : NukeBuild
         .Before(Restore)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(d => EnsureCleanDirectory(d));
-            TestsDirectory.GlobDirectories("**/bin", "**/obj").ForEach(d => EnsureCleanDirectory(d));
-            EnsureCleanDirectory(OutputDirectory);
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(d => d.DeleteDirectory());
+            TestsDirectory.GlobDirectories("**/bin", "**/obj").ForEach(d => d.DeleteDirectory());
+            OutputDirectory.CreateOrCleanDirectory();
             EnsureCleanDocFxArtifactx();
         });
 
@@ -87,7 +98,7 @@ namespace Dangl.ClockodoExport
         public static DateTime BuildDateUtc => {currentDateUtc};
     }}
 }}";
-            WriteAllText(filePath, content);
+            filePath.WriteAllText(content);
         });
 
     Target Compile => _ => _
@@ -112,7 +123,7 @@ namespace Dangl.ClockodoExport
             foreach (var publishTarget in PublishTargets)
             {
                 var tempPublishPath = OutputDirectory / "TempPublish";
-                EnsureCleanDirectory(tempPublishPath);
+                tempPublishPath.CreateOrCleanDirectory();
                 var zipPath = OutputDirectory / $"{publishTarget[0]}.zip";
                 DotNetPublish(x => x
                     .SetProcessWorkingDirectory(SourceDirectory / "Dangl.ClockodoExport")
@@ -123,17 +134,17 @@ namespace Dangl.ClockodoExport
                     .SetFileVersion(GitVersion.AssemblySemFileVer)
                     .SetAssemblyVersion(GitVersion.AssemblySemVer)
                     .SetInformationalVersion(GitVersion.InformationalVersion)
-                    .When(publishTarget[1] == "ubuntu-x64", c => c.SetProcessArgumentConfigurator(a => a
-                       .Add("/p:PublishTrimmed=true")
-                       .Add("/p:TrimMode=partial")
-                       .Add("/p:PublishSingleFile=true")
-                       .Add("/p:DebugType=None")))
-                    .When(publishTarget[1] != "ubuntu-x64", c => c.SetProcessArgumentConfigurator(a => a
-                       .Add("/p:PublishTrimmed=true")
-                       .Add("/p:TrimMode=partial")
-                       .Add("/p:PublishSingleFile=true")
-                       .Add("/p:DebugType=None")
-                       .Add("/p:PublishReadyToRun=true")))
+                    .When(publishTarget[1] == "linux-x64", c => c
+                       .AddProcessAdditionalArguments("/p:PublishTrimmed=true")
+                       .AddProcessAdditionalArguments("/p:TrimMode=partial")
+                       .AddProcessAdditionalArguments("/p:PublishSingleFile=true")
+                       .AddProcessAdditionalArguments("/p:DebugType=None"))
+                    .When(publishTarget[1] != "linux-x64", c => c
+                       .AddProcessAdditionalArguments("/p:PublishTrimmed=true")
+                       .AddProcessAdditionalArguments("/p:TrimMode=partial")
+                       .AddProcessAdditionalArguments("/p:PublishSingleFile=true")
+                       .AddProcessAdditionalArguments("/p:DebugType=None")
+                       .AddProcessAdditionalArguments("/p:PublishReadyToRun=true"))
                     );
                 ZipFile.CreateFromDirectory(tempPublishPath, zipPath);
             }
@@ -143,7 +154,7 @@ namespace Dangl.ClockodoExport
              {
                 new [] { "CLI_Windows_x86", "win-x86"},
                 new [] { "CLI_Windows_x64", "win-x64"},
-                new [] { "CLI_Linux_Ubuntu_x86", "ubuntu-x64"}
+                new [] { "CLI_Linux_x86", "linux-x64"}
              };
 
     Target PublishGitHubRelease => _ => _
@@ -170,12 +181,11 @@ namespace Dangl.ClockodoExport
          });
 
     Target BuildDocFxMetadata => _ => _
-        .DependsOn(Clean)
+        .DependsOn(Restore)
         .Executes(() =>
         {
-            DocFXMetadata(x => x
-                .SetProjects(DocFxFile)
-                .SetLogLevel(DocFXLogLevel.Warning));
+            var docFxPath = NuGetToolPathResolver.GetPackageExecutable("docfx", "tools/net8.0/any/docfx.dll");
+            DotNet($"{docFxPath} metadata {DocFxFile}");
         });
 
     Target BuildDocumentation => _ => _
@@ -191,9 +201,8 @@ namespace Dangl.ClockodoExport
 
             File.Copy(RootDirectory / "README.md", RootDirectory / "index.md");
 
-            DocFXBuild(x => x
-                .SetConfigFile(DocFxFile)
-                .SetLogLevel(DocFXLogLevel.Warning));
+            var docFxPath = NuGetToolPathResolver.GetPackageExecutable("docfx", "tools/net8.0/any/docfx.dll");
+            DotNet($"{docFxPath} {DocFxFile}");
 
             File.Delete(RootDirectory / "index.md");
             EnsureCleanDocFxArtifactx();
@@ -201,7 +210,7 @@ namespace Dangl.ClockodoExport
 
     void EnsureCleanDocFxArtifactx()
     {
-        DeleteDirectory(RootDirectory / "obj");
+        (RootDirectory / "obj").DeleteDirectory();
     }
 
     Target UploadDocumentation => _ => _
@@ -211,7 +220,7 @@ namespace Dangl.ClockodoExport
          .Requires(() => DocuBaseUrl)
          .Executes(() =>
          {
-             var markdownChangelog = ReadAllText(ChangeLogFile);
+             var markdownChangelog = ChangeLogFile.ReadAllText();
 
              WebDocu(s => s
                  .SetDocuBaseUrl(DocuBaseUrl)

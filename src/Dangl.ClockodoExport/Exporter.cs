@@ -31,17 +31,17 @@ namespace Dangl.ClockodoExport
             // Customers
             var httpClient = _getHttpClient();
 
-            var customersUrl = $"{CLOCKODO_API_BASE_URL}/v2/customers";
+            var customersUrl = $"{CLOCKODO_API_BASE_URL}/v3/customers";
             var jsonObjectCustomers = await GetAllElementsFromPagedEndpointAsync(customersUrl);
             _clockodoDataByModelName.Add("customers", jsonObjectCustomers);
 
             // Services
-            var servicesResponse = await httpClient.GetStringAsync($"{CLOCKODO_API_BASE_URL}/services");
+            var servicesResponse = await httpClient.GetStringAsync($"{CLOCKODO_API_BASE_URL}/v4/services");
             var jsonObjectServices = JObject.Parse(servicesResponse);
             _clockodoDataByModelName.Add("services", new List<JObject> { jsonObjectServices });
 
             // Users
-            var usersResponse = await httpClient.GetStringAsync($"{CLOCKODO_API_BASE_URL}/users");
+            var usersResponse = await httpClient.GetStringAsync($"{CLOCKODO_API_BASE_URL}/v3/users");
             var jsonObjectUsers = JObject.Parse(usersResponse);
             _clockodoDataByModelName.Add("users", new List<JObject> { jsonObjectUsers });
 
