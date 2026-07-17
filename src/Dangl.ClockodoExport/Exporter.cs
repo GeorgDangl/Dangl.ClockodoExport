@@ -50,7 +50,7 @@ namespace Dangl.ClockodoExport
             _clockodoDataByModelName.Add("entries", entriesResponse);
 
             // Projects
-            var projectsUrl = $"{CLOCKODO_API_BASE_URL}/v2/projects";
+            var projectsUrl = $"{CLOCKODO_API_BASE_URL}/v4/projects";
             var jsonObjectProjects = await GetAllElementsFromPagedEndpointAsync(projectsUrl);
             _clockodoDataByModelName.Add("projects", jsonObjectProjects);
 
