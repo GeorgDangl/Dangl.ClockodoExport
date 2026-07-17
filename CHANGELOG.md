@@ -2,6 +2,9 @@
 
 All notable changes to **Dangl.ClockodoExport** are documented here.
 
+## v1.2.1:
+- Migrate the projects endpoint to the new v4 api endpoint
+
 ## v1.2.0:
 - Update to .NET 10
 - Updated the API client to call the new Clockodo endpoints for all resources
