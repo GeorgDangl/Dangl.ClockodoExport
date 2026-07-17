@@ -1,42 +1,42 @@
-using Nuke.Common;
-using Nuke.Common.CI;
-using Nuke.Common.Execution;
-using Nuke.Common.Git;
-using Nuke.Common.IO;
-using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
-using Nuke.Common.Tools.DocFX;
-using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.GitVersion;
-using Nuke.Common.Utilities.Collections;
-using Nuke.GitHub;
-using Nuke.WebDocu;
+using Fallout.Common;
+using Fallout.Common.CI;
+using Fallout.Common.Execution;
+using Fallout.Common.Git;
+using Fallout.Common.IO;
+using Fallout.Common.ProjectModel;
+using Fallout.Common.Tooling;
+using Fallout.Common.Tools.DocFX;
+using Fallout.Common.Tools.DotNet;
+using Fallout.Common.Tools.GitVersion;
+using Fallout.Common.Utilities.Collections;
+using Fallout.GitHub;
+using Fallout.WebDocu;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using static Nuke.GitHub.GitHubTasks;
-using static Nuke.WebDocu.WebDocuTasks;
+using static Fallout.GitHub.GitHubTasks;
+using static Fallout.WebDocu.WebDocuTasks;
 using System.Collections.Generic;
-using Nuke.Common.Tools.Teams;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using Nuke.Common.Tools.Coverlet;
-using Nuke.Common.Tools.ReportGenerator;
-using Nuke.Common.Utilities;
+using Fallout.Common.Tools.Teams;
+using static Fallout.Common.Tools.DotNet.DotNetTasks;
+using Fallout.Common.Tools.Coverlet;
+using Fallout.Common.Tools.ReportGenerator;
+using Fallout.Common.Utilities;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using static Nuke.Common.ChangeLog.ChangelogTasks;
-using static Nuke.Common.IO.Globbing;
-using static Nuke.Common.Tooling.ProcessTasks;
-using Nuke.Common.Tools.Docker;
+using static Fallout.Common.ChangeLog.ChangelogTasks;
+using static Fallout.Common.IO.Globbing;
+using static Fallout.Common.Tooling.ProcessTasks;
+using Fallout.Common.Tools.Docker;
 using System.Xml.Schema;
-using Nuke.Common.Tools.Npm;
+using Fallout.Common.Tools.Npm;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Tasks;
 
-class Build : NukeBuild
+class Build : FalloutBuild
 {
     public static int Main() => Execute<Build>(x => x.Compile);
 
