@@ -2,6 +2,9 @@
 
 All notable changes to **Dangl.ClockodoExport** are documented here.
 
+## v1.2.2:
+- **Dangl.ClockodoExport** now also produces Markdown documentation. This can be easily accessed by AI agents via the MCP server implementation in **Dangl**Docu.
+
 ## v1.2.1:
 - Migrate the projects endpoint to the new v4 api endpoint
 
