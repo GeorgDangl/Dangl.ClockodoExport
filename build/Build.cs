@@ -203,6 +203,7 @@ namespace Dangl.ClockodoExport
 
             var docFxPath = NuGetToolPathResolver.GetPackageExecutable("docfx", "tools/net8.0/any/docfx.dll");
             DotNet($"{docFxPath} {DocFxFile}");
+            MarkdownDocumentation.Create(DocFxFile, OutputDirectory / "docs-markdown");
 
             File.Delete(RootDirectory / "index.md");
             EnsureCleanDocFxArtifactx();
@@ -225,6 +226,7 @@ namespace Dangl.ClockodoExport
              WebDocu(s => s
                  .SetDocuBaseUrl(DocuBaseUrl)
                  .SetDocuApiKey(DocuApiKey)
+                 .SetMarkdownPackagePath(OutputDirectory / "docs-markdown.zip")
                  .SetSourceDirectory(OutputDirectory / "docs")
                  .SetVersion(GitVersion.NuGetVersion)
                  .SetMarkdownChangelog(markdownChangelog)
